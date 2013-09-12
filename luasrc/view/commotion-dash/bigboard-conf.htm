@@ -45,18 +45,17 @@ uri_prefix, num_post = string.gsub(uri, "bigboard%-conf_.*", "bigboard-conf")
   });
 </script>
 
-<h1>Bigboard Configuration</h1>
+<h1><%:Bigboard Configuration%></h1>
 
 <h2 class="warning"><%=ERR%></h2>
 
-<p>Bigboard is a network administration tool designed to give
+<p><%:Bigboard is a network administration tool designed to give
 network managers a quick view of network status. Use this page to
-turn Bigboard on or off, and to manage Bigboard settings.</p>
+turn Bigboard on or off, and to manage Bigboard settings.%></p>
 
 <form method="post" action="<%=uri_prefix%>_submit" enctype="multipart/form-data" id="bb-power">
 	<% for db_name, char in pairs(jsonInfo) do %>
 	<input type="hidden" name="dashName" value="<%=jsonInfo[db_name]['name']%>" />
-<!-- To do: Poll for current settings -->
 <!-- To do: change toggleVisibility to use radio instead of checkbox -->
 	<legend>
 	<% 
@@ -71,19 +70,18 @@ turn Bigboard on or off, and to manage Bigboard settings.</p>
 		end
 	%>	
 	<input type="checkbox" name="bbOnOff" value="true" onClick="toggleVisibility(this)" <%=checked%> />
-	Enable/Disable BigBoard
+	<%:Enable/Disable Dashboard Statistics%>
 	</legend>	
 
 	<h2 class="warning"><%=destErr%></h2>
 
 	<div id="destination" style="display:<%=display%>;">
-		<legend>Identify Bigboard Gatherer</legend>
+		<legend><%:Identify BigBoard Gatherer%></legend>
 
 <!-- to do: sanitize inputs -->
-		<p>Enter the destination IP address for network statistics</p>
+		<p><%:Enter the destination IP address for network statistics%></p>
 		<input type="text" placeholder="<%=jsonInfo[db_name]['gatherer']%>" name='gatherer_ip' />
 	</div>
-<!-- To do: Allow bigboard gatherer to display AP clients -->
 
 	<% end %>
 	<input type="submit" name="submit" value="Apply &amp; Save" />	
