@@ -18,7 +18,9 @@ require "luci.fs"
 require "luci.sys"
 require "commotion_helpers"
 
-local dashConfig = "/etc/config/commotion-dash"
+-- Global strings for log functions. Consider moving to commotion_helpers or similar
+logErr=translate("ERROR: ")
+logInfo=translate("INFO: ")
 
 function index()
 	require("luci.i18n").loadc("commotion")
@@ -41,7 +43,8 @@ function index()
 			entry({"admin", "commotion", "bigboard-conf_submit"}, call("ifprocess"))
 			entry({"admin", "commotion", "bigboard-conf"}, call("main"), translate("BigBoard Configuration"), 20).dependent=false
 		else
-			log("Can't run Commotion-Dashboard. Install olsrd jsoninfo plugin.")
+			ERR=logERR .. translate("Can't run Commotion-Dashboard. Install olsrd jsoninfo plugin.")
+			log(ERR)
 		end
 	end
 end
@@ -50,11 +53,6 @@ function main(ERR)
 	local jsonInfo={}	
         local uci = luci.model.uci.cursor()
 	
---[[ Config file format
-config dashboard
-	option enabled 'true'
-	option gatherer 'x.x.x.x'
-]]--
 	uci:get_all('commotion-dash')
 	uci:foreach('commotion-dash', 'dashboard',
 		function(s)
@@ -80,13 +78,15 @@ function ifprocess()
 		is_ip4addr_cidr(values['gatherer_ip']) == true or 
 		is_fqdn(values['gatherer_ip']) ~= nil then
 	else
-		ERR = 'ERROR: invalid IP or site address ' .. values['gatherer_ip']
-		log("Error validating inputs " .. values['gatherer_ip'])
+		ERR = logERR .. translate('invalid IP or site address ') .. values['gatherer_ip']
+		log(ERR)
 		main(ERR)
 	end
 	if values['bbOnOff'] ~= nil then
-		log("Commotion-Dashboard: Enabling network stats submission...")
-		log("Commotion-Dashboard: Setting " .. values['gatherer_ip'] .. "as network stats collector")
+		local MSG = logINFO .. translate("Commotion-Dashboard: Enabling network statistics submission")
+		log(MSG)
+		MSG = logINFO .. translate("Commotion-Dashboard: Setting ") .. values['gatherer_ip'] .. translate("as network stats collector")
+		log(MSG)
 		if ERR == nil then
 			local uci = luci.model.uci.cursor()
 			uci:set("commotion-dash", values['dashName'], "enabled", values['bbOnOff'])
@@ -95,7 +95,7 @@ function ifprocess()
 			uci:save('commotion-dash')
 		end	
 	else
-		log("Disabling Commotion-Dashboard")
+		local MSG = logINFO .. translate("Disabling Commotion-Dashboard")
 		local uci = luci.model.uci.cursor()
 		uci:set("commotion-dash", values["dashName"], 'enabled', 'false')
 		uci:set("commotion-dash", values["dashName"], 'gatherer', 'x.x.x.x')
